@@ -10,6 +10,7 @@ from dip.extensions import db
 
 bp = Blueprint('bp_auth', __name__)
 
+
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
@@ -25,13 +26,22 @@ def login():
         username = request.form['username']
         plain_password = request.form['password']
 
-        hashed_password = generate_password_hash(plain_password, current_app.config['PASSWORD_SALT'])
-        
-        user_query = db.session.query(User).filter(text(f"username='{username}' AND password='{hashed_password}'"))
+        #
+        username = username.replace("'", "")
+        plain_password = plain_password.replace("'", "")
+        #
+
+        hashed_password = generate_password_hash(
+            plain_password, current_app.config['PASSWORD_SALT'])
+
+        user_query = db.session.query(User).filter(
+            text(f"username='{username}' AND password='{hashed_password}'"))
 
         conn = db.engine.raw_connection()
         cur = conn.cursor()
-        user = cur.execute(str(user_query)).fetchone()
+        cur.execute(str(user_query))
+        user = cur.fetchone()
+
         user = dict(zip([
             'id',
             'first_name',
@@ -50,7 +60,7 @@ def login():
             return render_template('login.html', error='Неверный логин или пароль'), 403
 
         session = create_session(user['username'], user['role'])
-        
+
         resp = redirect(url_for('bp_user.profile'))
         resp.set_cookie(SESSION_COOKIE_NAME, session)
 
