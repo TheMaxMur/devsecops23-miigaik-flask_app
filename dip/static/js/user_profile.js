@@ -1,5 +1,15 @@
 const editButton = document.querySelector(".user-card__button");
-editButton.addEventListener('click', (e) => { e.preventDefault(); openEditModal() })
+//editButton.addEventListener('click', (e) => { e.preventDefault(); openEditModal() })
+
+// Опять хуйня с адресом страницы
+editButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (window.parent === e.source && "https://127.0.0.1:5000" === e.origin) {
+        openEditModal()
+    }
+})
+
+
 
 const photoInput = document.getElementById("photo");
 const photoPreview = document.getElementById("photo_preview");
@@ -49,7 +59,7 @@ async function handleFormSubmit(event) {
         const newFilename = Math.random().toString(16).slice(2) + '.' + formData.get('photo').name.split('.').pop()
         formData.set('photo', formData.get('photo'), newFilename);
     }
-    
+
     fetch(userUrl, {
         method: 'POST',
         body: formData,
