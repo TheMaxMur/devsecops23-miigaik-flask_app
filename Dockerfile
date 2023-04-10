@@ -4,7 +4,7 @@ FROM python:3.11.3-slim-buster
 COPY . /app
 
 RUN apt update && \
-    apt install libmariadb-dev g++ libpq-dev gcc exiftool -y && \
+    apt install libmariadb-dev g++ libpq-dev gcc exiftool -y 
 
 RUN python3 -m pip install -r /app/requirements.txt
 
