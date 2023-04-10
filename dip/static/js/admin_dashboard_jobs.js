@@ -10,15 +10,38 @@ deleteButtons.forEach(button => {
 
     const jobTitleId = button.parentNode.id;
 
-    //deleteJobTitle(jobTitleId);
+    //deleteJobTitle(jobTitleId); //Чтобы вернуть всё, как было, нужно это раскомментить, а условие снизу + текст удалить нахой
 
-    // Check sender identity
-    // Опять хуйня с адресом страницы
-    if (e.origin === 'http://127.0.0.1:5000' && e.source === parent) {
+    // Проверка наличия элемента с jobTitleId на странице
+    const jobTitleEl = document.getElementById(jobTitleId);
+    if (!jobTitleEl) {
+      console.error(`Элемент по номеру ID ${jobTitleId} на странице не найден`);
+      return;
+    }
+
+    // Проверка на подлинность отправителя и наличие достаточных прав
+    if (isAuthorizedToDelete(jobTitleId, e.origin, e.source)) {
       deleteJobTitle(jobTitleId);
     } else {
-      console.warn('Неавторизованный отправитель');
+      console.error(`Неавторизованная поптыка удалить ID ${jobTitleId}`);
     }
+
+    //Текст уязвимости, сслыку не нашёл: When receiving message with message event, the 
+    //sender's identity should be verified using the origin and possibly source properties. 
+    //For more information checkout the OWASP A2:2017 
+    //(https://owasp.org/www-project-top-ten/2017/A2_2017-Broken_Authentication) and 
+    //(https://developer. mozilla.org/en-US/docs/Web/API/Window/postMessage) advisory. 
+    //Code: button.addEventListener('click', (e) => {
+
+    // Опять хуйня с адресом страницы.
+    // Нужно проверить идентификатор отправителя, который указывается в свойстве origin
+    // и в свойстве source объекта event. В условии происходит проверка, что отправитель 
+    // сообщения имеет идентификатор 
+    //if (e.origin === 'http://127.0.0.1:5000' && e.source === parent) {
+    //  deleteJobTitle(jobTitleId);
+    //} else {
+    //  console.warn('Неавторизованный отправитель');
+    //}
   });
 });
 
