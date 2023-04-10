@@ -17,6 +17,7 @@ RUN chown -R python:python /app
 
 WORKDIR /app
 
+
 USER python
 
 CMD ["flask", "run", "--host=0.0.0.0"]
