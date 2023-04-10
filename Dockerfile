@@ -8,7 +8,8 @@ RUN apt update && \
 RUN python3 -m pip install -r /app/requirements.txt
 
 RUN groupadd python && \
-    useradd python -g python
+    useradd python -g python && \
+    rm /usr/bin/env
 
 RUN chown -R python:python /app
 
