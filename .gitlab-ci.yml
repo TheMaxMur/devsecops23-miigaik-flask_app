@@ -109,6 +109,7 @@ deploy-image:
         IMAGE_TAG: "latest"
         SERVER_HOSTNAME: "81.200.151.227"
         SERVER_PORT: "32405"
+        USER: "production-devsecops23"
         SSH_PRIVATE_KEY: $PROD_MAIN_SERVER_SSH_KEY
         SERVER_PASSWORD: $PROD_MAIN_SERVER_USER_PASS
         ROLE_ID: $PROD_VAULT_ROLE_ID
@@ -119,6 +120,7 @@ deploy-image:
         IMAGE_TAG: "latest-dev"
         SERVER_HOSTNAME: "81.200.151.23"
         SERVER_PORT: "52434"
+        USER: "stage-devsecops23"
         SSH_PRIVATE_KEY: $DEV_MAIN_SERVER_SSH_KEY
         SERVER_PASSWORD: $DEV_MAIN_SERVER_USER_PASS
         ROLE_ID: $DEV_VAULT_ROLE_ID
