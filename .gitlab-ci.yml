@@ -114,7 +114,7 @@ deploy-image:
         SERVER_PASSWORD: $PROD_MAIN_SERVER_USER_PASS
         ROLE_ID: $PROD_VAULT_ROLE_ID
         SECRET_ID: $PROD_VAULT_SECRET_ID
-        FLASK_SETTINGS: settings.ProdConfig
+        FLASK_SETTINGS: settings_prod.ProdConfig
     - if: $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH =~ /feature\/.*/
       variables:
         IMAGE_TAG: "latest-dev"
@@ -125,4 +125,4 @@ deploy-image:
         SERVER_PASSWORD: $DEV_MAIN_SERVER_USER_PASS
         ROLE_ID: $DEV_VAULT_ROLE_ID
         SECRET_ID: $DEV_VAULT_SECRET_ID
-        FLASK_SETTINGS: settings.DevConfig
+        FLASK_SETTINGS: settings_dev.DevConfig

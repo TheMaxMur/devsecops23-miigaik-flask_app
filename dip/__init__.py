@@ -27,7 +27,10 @@ def create_admin_user(db, config):
             role='admin'
             )
         db.session.add(admin)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except:
+            print("User alredy exist")
 
     return
 
@@ -46,11 +49,11 @@ def register_blueprints(app):
 def create_app():
     app = Flask(__name__)
 
-    FLASK_SETTINGS = os.environ.get("FLASK_SETTINGS", "settings.LocalConfig")
+    FLASK_SETTINGS = os.environ.get("FLASK_SETTINGS", "settings_local.LocalConfig")
 
     app.config.from_object(FLASK_SETTINGS)
 
-    if FLASK_SETTINGS == "settings.LocalConfig":
+    if FLASK_SETTINGS == "settings_local.LocalConfig":
         pathlib.Path(app.instance_path).mkdir(parents=True, exist_ok=True)
         pathlib.Path(app.config['DATABASE_PATH']).touch(exist_ok=True)
 
