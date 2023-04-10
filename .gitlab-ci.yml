@@ -1,0 +1,128 @@
+image:
+  name: maxmur/compose:1.29.2
+
+services:
+  - name: docker:20.10.17-dind
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_CERT_PATH: "/certs/client/"
+  DOCKER_HOST: tcp://docker:2376
+  DOCKER_TLS_VERIFY: 1
+
+stages:
+  - pre-build
+  - build
+  - post-build
+  - test
+  - deploy
+
+.container_scanning_template:
+  image: "$CS_ANALYZER_IMAGE$CS_IMAGE_SUFFIX"
+  stage: test
+  variables:
+    GIT_STRATEGY: none
+  allow_failure: true
+  artifacts:
+    expire_in: 1 week
+    reports:
+      container_scanning: gl-container-scanning-report.json
+      dependency_scanning: gl-dependency-scanning-report.json
+    paths: [gl-container-scanning-report.json, gl-dependency-scanning-report.json]
+  script:
+    - gtcs scan 
+    - >
+      curl -k -X POST -H "Authorization: Token $DEFECTDOJO_API_KEY" -F "file=@gl-container-scanning-report.json" 
+      -F "product_name=FlaskApp" -F "engagement_name=gitlabCi" -F "scan_type=GitLab Container Scan" 
+      https://defectdojo.devsecops.maxmur.info/api/v2/import-scan/ &&
+    - >
+      curl -k -X POST -H "Authorization: Token $DEFECTDOJO_API_KEY" -F "file=@gl-dependency-scanning-report.json" 
+      -F "product_name=FlaskApp" -F "engagement_name=gitlabCi" -F "scan_type=Gitlab Dependency Scanning Report" 
+      https://defectdojo.devsecops.maxmur.info/api/v2/import-scan/  
+
+sast:
+  stage: pre-build
+  script:
+    - >
+      docker run -v /var/run/docker.sock:/var/run/docker.sock 
+      -v $(pwd):/src/horusec horuszup/horusec-cli:latest 
+      horusec start -p /src/horusec/ -P $(pwd) -s="LOW" -o="json" -O="/src/horusec/report.json" &&
+      curl -k -X POST -H "Authorization: Token $DEFECTDOJO_API_KEY" -F "file=@$(pwd)/report.json" 
+      -F "product_name=FlaskApp" -F "engagement_name=gitlabCi" -F "scan_type=Horusec Scan" 
+      https://defectdojo.devsecops.maxmur.info/api/v2/import-scan/
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "develop"
+    - if: $CI_COMMIT_BRANCH =~ /feature\/.*/
+
+build-app-image:
+  stage: build
+  needs: [sast]
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE/flask_app:$CI_COMMIT_SHORT_SHA -f ./Dockerfile .
+    - docker push $CI_REGISTRY_IMAGE/flask_app:$CI_COMMIT_SHORT_SHA
+    - docker tag $CI_REGISTRY_IMAGE/flask_app:$CI_COMMIT_SHORT_SHA $CI_REGISTRY_IMAGE/flask_app:$IMAGE_TAG
+    - docker push $CI_REGISTRY_IMAGE/flask_app:$IMAGE_TAG
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+      variables:
+        IMAGE_TAG: "latest"
+    - if: $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH =~ /feature\/.*/
+      variables:
+        IMAGE_TAG: "latest-dev"
+
+container_scanning_flask_app:
+  extends: .container_scanning_template
+  stage: post-build
+  needs: [build-app-image]
+  variables:
+    CS_ANALYZER_IMAGE: registry.gitlab.com/security-products/container-scanning/grype:5-fips
+    CS_IMAGE: $CI_REGISTRY_IMAGE/flask_app:$CI_COMMIT_SHORT_SHA
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH =~ /feature\/.*/
+
+deploy-image:
+  stage: deploy
+  needs: [build-app-image]
+  before_script:
+    - apk add openssh
+    - eval $(ssh-agent -s)
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+  script:
+    - >
+      ssh $USER@$SERVER_HOSTNAME -p $SERVER_PORT
+      "cd /home/$USER/iac/ &&
+      echo "$SERVER_PASSWORD" | sudo -S FLASK_APP_IMAGE=$CI_REGISTRY_IMAGE/flask_app:$IMAGE_TAG
+      docker-compose pull flask_app &&
+      echo "$SERVER_PASSWORD" | sudo -S FLASK_APP_IMAGE=$CI_REGISTRY_IMAGE/flask_app:$IMAGE_TAG
+      FLASK_SETTINGS_CLASS=$FLASK_SETTINGS VAULT_ROLE_ID=$ROLE_ID VAULT_SECRET_ID=$SECRET_ID
+      docker-compose up -d flask_app &&
+      exit"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+      variables:
+        IMAGE_TAG: "latest"
+        SERVER_HOSTNAME: "81.200.151.227"
+        SERVER_PORT: "32405"
+        USER: "production-devsecops23"
+        SSH_PRIVATE_KEY: $PROD_MAIN_SERVER_SSH_KEY
+        SERVER_PASSWORD: $PROD_MAIN_SERVER_USER_PASS
+        ROLE_ID: $PROD_VAULT_ROLE_ID
+        SECRET_ID: $PROD_VAULT_SECRET_ID
+        FLASK_SETTINGS: settings.ProdConfig
+    - if: $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH =~ /feature\/.*/
+      variables:
+        IMAGE_TAG: "latest-dev"
+        SERVER_HOSTNAME: "81.200.151.23"
+        SERVER_PORT: "52434"
+        USER: "stage-devsecops23"
+        SSH_PRIVATE_KEY: $DEV_MAIN_SERVER_SSH_KEY
+        SERVER_PASSWORD: $DEV_MAIN_SERVER_USER_PASS
+        ROLE_ID: $DEV_VAULT_ROLE_ID
+        SECRET_ID: $DEV_VAULT_SECRET_ID
+        FLASK_SETTINGS: settings.DevConfig
