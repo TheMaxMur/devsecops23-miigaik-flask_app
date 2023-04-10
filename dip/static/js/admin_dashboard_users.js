@@ -6,8 +6,7 @@ const addButton = document.querySelector('.user-list__button--add');
 
 editButtons.forEach((button) => {
     const userId = button.parentNode.parentNode.id
-    //button.addEventListener('click', (e) => { e.preventDefault(); openEditModal(userId) })
-    button.addEventListener('click', () => { openEditModal(userId) })
+    button.addEventListener('click', (e) => { e.preventDefault(); openEditModal(userId) })
 });
 
 deleteButtons.forEach(button => {
@@ -79,12 +78,12 @@ async function openEditModal(userId) {
         editUserForm.elements.email.value = currentUser.email;
         editUserForm.elements.phone_number.value = currentUser.phone_number;
         editUserForm.elements.role.value = currentUser.role;
-
+        
         if (currentUser.photo) {
             document.getElementById('photo_preview').src = `/user/${userId}/photo`;
         }
 
-
+        
     }
     var errorElement = document.querySelector('.message-error');
     errorElement.style.display = 'none'
@@ -121,19 +120,19 @@ async function handleFormSubmit(event) {
     if (id) {
         userUrl = `/admin/dashboard/user/${id}/update`;
     }
-
+    
 
     // Чтобы сервер мог отследить, что аватар не менялся
     if (formData.get('photo').name !== '') {
         // Чтобы пользователь не загрузил RCE
-         //
-         let cryptoRandom = new Uint32Array(1);
-         window.crypto.getRandomValues(cryptoRandom);
-         const newFilename =  cryptoRandom[0].toString(16).slice(2) + '.' + formData.get('photo').name.split('.').pop()
-         //
+
+        const array = new Uint32Array(1);
+        crypto.getRandomValues(array);
+
+        const newFilename = array[0].toString(16).slice(2) + '.' + formData.get('photo').name.split('.').pop()
         formData.set('photo', formData.get('photo'), newFilename);
     }
-
+    
     fetch(userUrl, {
         method: 'POST',
         body: formData,

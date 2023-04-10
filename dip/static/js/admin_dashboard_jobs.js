@@ -10,15 +10,8 @@ deleteButtons.forEach(button => {
 
     const jobTitleId = button.parentNode.id;
 
-    //deleteJobTitle(jobTitleId);
-
-    // Check sender identity
-    // Опять хуйня с адресом страницы
-    if (e.origin === 'http://127.0.0.1:5000' && e.source === parent) {
-      deleteJobTitle(jobTitleId);
-    } else {
-      console.warn('Неавторизованный отправитель');
-    }
+    deleteJobTitle(jobTitleId);
+    
   });
 });
 
@@ -41,12 +34,12 @@ jobTitleEditable.forEach(field => {
 
 function deleteJobTitle(jobTitleId) {
   fetch(`/admin/dashboard/job-titles/${jobTitleId}/delete`)
-    .then((response) => {
-      if (response.ok) {
-        const el = document.querySelector(`.job-titles-list__item[id="${jobTitleId}"]`);
-        el.remove();
-      }
-    })
+  .then((response) => {
+    if (response.ok) {
+      const el = document.querySelector(`.job-titles-list__item[id="${ jobTitleId }"]`);
+      el.remove();
+    }
+  })
 }
 
 function updateJobTitle(jobTitleId, newJobTitle) {
@@ -61,16 +54,16 @@ function updateJobTitle(jobTitleId, newJobTitle) {
       title: newJobTitle
     })
   })
-    .then((response) => {
-      if (response.ok) {
-        const el = document.querySelector(`.job-titles-list__item[id="${jobTitleId}"] > .job-titles-list__name`);
-        el.blur()
-      } else {
-        response.text().then((error) => {
-          showError(error)
-        })
-      }
-    })
+  .then((response) => {
+    if (response.ok) {
+      const el = document.querySelector(`.job-titles-list__item[id="${ jobTitleId }"] > .job-titles-list__name`);
+      el.blur()
+    } else {
+      response.text().then((error) => {
+        showError(error)
+      })
+    }
+  })
 }
 
 
@@ -78,11 +71,11 @@ var timer = null;
 
 function showError(message) {
   if (timer !== null) {
-    clearTimeout(timer);
-    timer = null;
+      clearTimeout(timer);
+      timer = null;
   }
   var errorElement = document.querySelector(".job-titles-list__temp-message-error");
   errorElement.innerHTML = message;
   errorElement.style.display = 'block';
-  timer = setTimeout(function () { errorElement.style.display = 'none'; }, 2000);
+  timer = setTimeout(function(){ errorElement.style.display = 'none'; }, 2000);
 }
