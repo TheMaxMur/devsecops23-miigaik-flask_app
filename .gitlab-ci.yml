@@ -114,7 +114,7 @@ deploy-image:
         ROLE_ID: $PROD_VAULT_ROLE_ID
         SECRET_ID: $PROD_VAULT_SECRET_ID
         FLASK_SETTINGS: settings.ProdConfig
-    - if: $CI_COMMIT_BRANCH == "develop"
+    - if: $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH =~ /feature\/.*/
       variables:
         IMAGE_TAG: "latest-dev"
         SERVER_HOSTNAME: "176.53.162.210"
