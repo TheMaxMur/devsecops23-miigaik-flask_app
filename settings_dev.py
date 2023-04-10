@@ -21,7 +21,7 @@ class DevConfig:
     DB_PASSWORD = json.loads(requests.get(BASE_URL + '/v1/secret/dev/db_password', \
                             headers={"X-Vault-Token": TOKEN}).text)['data']['DB_PASSWORD']
 
-    SQLALCHEMY_DATABASE_URI = f"postgresql://{DB_USER}:{DB_PASSWORD}@localhost:5432/{DB_NAME}"
+    SQLALCHEMY_DATABASE_URI = f"postgresql://{DB_USER}:{DB_PASSWORD}@db:5432/{DB_NAME}"
 
     PATHS = {
         'user_md_files': pathlib.Path('user_md_files'),
