@@ -2,6 +2,7 @@ const editButton = document.querySelector(".user-card__button");
 //Оригинальная строчка:
 //editButton.addEventListener('click', (e) => { e.preventDefault(); openEditModal() })
 
+//!
 //Текст уязвимости: When receiving message with message event, the sender's identity should 
 //be verified using the origin and possibly source properties. For more information checkout the OWASP A2:2017 
 //(https://owasp.org/www-project-top-ten/2017/A2_2017-Broken_Authentication) and 
@@ -21,7 +22,7 @@ editButton.addEventListener('click', (e) => {
     //if (window.parent === e.source && "https://127.0.0.1:5000" === e.origin) {openEditModal()}
 })
 
-//оригинал из девелопа
+//оригинал из девелопа: //Вернуть и удалить гойскую функцию
 //editButton.addEventListener('click', (e) => { e.preventDefault(); openEditModal() })
 
 const photoInput = document.getElementById("photo");

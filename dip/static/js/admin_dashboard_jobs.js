@@ -26,6 +26,7 @@ deleteButtons.forEach(button => {
       console.error(`Неавторизованная поптыка удалить ID ${jobTitleId}`);
     }
 
+    //!
     //Текст уязвимости, сслыку не нашёл: When receiving message with message event, the 
     //sender's identity should be verified using the origin and possibly source properties. 
     //For more information checkout the OWASP A2:2017 
