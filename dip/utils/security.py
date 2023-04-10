@@ -1,4 +1,5 @@
 import os
+import subprocess
 import hmac
 import hashlib
 import pathlib
@@ -10,7 +11,7 @@ ALLOWED_IMAGE_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
 
 def generate_password_hash(password, salt):
-    return hashlib.md5((password + salt).encode('utf-8')).hexdigest()
+    return hashlib.sha256((password + salt).encode('utf-8')).hexdigest()
 
 
 def is_correct_password(plain_password, hashed_password, salt):
@@ -48,6 +49,6 @@ def remove_image_metadata(filename):
 
     command = f'exiftool -EXIF= { filepath }'
 
-    os.system(command)
-
+    #os.system(command)
+    subprocess.run(command.split(), check=True)
 

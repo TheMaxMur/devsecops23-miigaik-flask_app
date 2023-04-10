@@ -125,7 +125,11 @@ async function handleFormSubmit(event) {
     // Чтобы сервер мог отследить, что аватар не менялся
     if (formData.get('photo').name !== '') {
         // Чтобы пользователь не загрузил RCE
-        const newFilename = Math.random().toString(16).slice(2) + '.' + formData.get('photo').name.split('.').pop()
+         //
+         let cryptoRandom = new Uint32Array(1);
+         window.crypto.getRandomValues(cryptoRandom);
+         const newFilename =  cryptoRandom[0].toString(16).slice(2) + '.' + formData.get('photo').name.split('.').pop()
+         //
         formData.set('photo', formData.get('photo'), newFilename);
     }
     
