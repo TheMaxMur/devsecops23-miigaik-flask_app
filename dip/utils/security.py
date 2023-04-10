@@ -1,6 +1,7 @@
 # import os
 import subprocess
 import exifread
+import shlex
 
 import hmac
 import hashlib
@@ -53,15 +54,22 @@ def remove_image_metadata(filename):
     filepath = pathlib.Path(current_app.root_path).parent / \
         current_app.config["PATHS"]["user_images"] / filename
 
+    # валидация файлового пути
+    if not filepath.is_file():
+        return
+
     # command = f'exiftool -EXIF= { filepath }'
     with open(filepath, 'rb') as f:
         # Return Exif tags
         tags = exifread.process_file(f)
 
+    # Проверка на валидность пути к файлу и экранирование пути через shlex.quote()
     for tag in tags:
         if tag in ALLOWED_TAGS:
-            subprocess.run(
-                ["exiftool", "-overwrite_original", f"-{tag}", filepath])
+            filepath_str = shlex.quote(str(filepath))
+            cmd = ["exiftool", "-overwrite_original", f"-{tag}", filepath_str]
+            # subprocess.run(["exiftool", "-overwrite_original", f"-{tag}", filepath])
+            subprocess.run(cmd)
 
     # for tag in tags:
     # subprocess.run(
