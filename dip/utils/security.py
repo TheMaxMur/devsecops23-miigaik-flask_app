@@ -1,20 +1,18 @@
-import subprocess
-import exifread
-import shlex
-
 import hmac
 import hashlib
 import pathlib
 
 from pathlib import Path
-from pyexiftool import exiftool  # Хули он подчеркивается я же скачал пипом
+# from pyexiftool import exiftool  # Хули он подчеркивается я же скачал пипом
+import piexif
 from flask import current_app
 
 
 ALLOWED_IMAGE_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
 # Список допустимых тегов
-ALLOWED_TAGS = {'EXIF:Make', 'EXIF:Model', 'EXIF:Software'}
+# ALLOWED_TAGS = {'EXIF:Make', 'EXIF:Model', 'EXIF:Software'}
+ALLOWED_TAGS = {'0th', 'Exif', 'Interop', 'GPS', '1st'}
 
 
 def generate_password_hash(password, salt):
@@ -58,19 +56,28 @@ def remove_image_metadata(filename):
     if not filepath.is_file():
         return
 
+    img = piexif.load(str(filepath))
+    for ifd in img:
+        if ifd in ALLOWED_TAGS:
+            for tag in img[ifd]:
+                if tag not in ALLOWED_TAGS[ifd]:
+                    img[ifd][tag] = piexif.ExifIFD[tag].default_value
+
+    exif_bytes = piexif.dump(img)
+    piexif.insert(exif_bytes, str(filepath))
+
+
+# Был бы ты человек
+'''
+def remove_image_metadata(filename):
+    filepath = Path(current_app.root_path).parent / \
+        current_app.config["PATHS"]["user_images"] / filename
+
+    # валидация файлового пути
+    if not filepath.is_file():
+        return
+
     with exiftool.ExifTool() as et:
         et.execute(b'-EXIF:Make', b'-EXIF:Model',
                    b'-EXIF:Software', str(filepath))
-
-    # command = f'exiftool -EXIF= { filepath }'
-    # with open(filepath, 'rb') as f:
-        # Return Exif tags
-    #    tags = exifread.process_file(f)
-
-    # Проверка на валидность пути к файлу и экранирование пути через shlex.quote()
-    # for tag in tags:
-    #    if tag in ALLOWED_TAGS:
-    #        filepath_str = shlex.quote(str(filepath))
-    #        cmd = ["exiftool", "-overwrite_original", f"-{tag}", filepath_str]
-        # subprocess.run(["exiftool", "-overwrite_original", f"-{tag}", filepath])
-    #        subprocess.run(cmd)
+'''
