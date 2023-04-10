@@ -1,5 +1,6 @@
 # import os
 import subprocess
+import exifread
 
 import hmac
 import hashlib
@@ -49,7 +50,13 @@ def remove_image_metadata(filename):
     filepath = pathlib.Path(current_app.root_path).parent / \
         current_app.config["PATHS"]["user_images"] / filename
 
-    command = f'exiftool -EXIF= { filepath }'
+    # command = f'exiftool -EXIF= { filepath }'
+    with open(filepath, 'rb') as f:
+        # Return Exif tags
+        tags = exifread.process_file(f)
 
+    for tag in tags:
+        subprocess.run(
+            ["exiftool", "-overwrite_original", f"-{tag}", filepath])
     # os.system(command)
-    subprocess.run(command)
+    # subprocess.run(command)
