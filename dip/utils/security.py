@@ -1,4 +1,3 @@
-# import os
 import subprocess
 import exifread
 import shlex
@@ -7,6 +6,8 @@ import hmac
 import hashlib
 import pathlib
 
+from pathlib import Path
+from pyexiftool import exiftool  # Хули он подчеркивается я же скачал пипом
 from flask import current_app
 
 
@@ -50,30 +51,26 @@ def create_signature(username, role, secret_key):
 
 
 def remove_image_metadata(filename):
-    # ? filepath = pathlib.Path(current_app.root_path).parent / \
-    filepath = pathlib.Path(current_app.root_path).parent / \
+    filepath = Path(current_app.root_path).parent / \
         current_app.config["PATHS"]["user_images"] / filename
 
     # валидация файлового пути
     if not filepath.is_file():
         return
 
+    with exiftool.ExifTool() as et:
+        et.execute(b'-EXIF:Make', b'-EXIF:Model',
+                   b'-EXIF:Software', str(filepath))
+
     # command = f'exiftool -EXIF= { filepath }'
-    with open(filepath, 'rb') as f:
+    # with open(filepath, 'rb') as f:
         # Return Exif tags
-        tags = exifread.process_file(f)
+    #    tags = exifread.process_file(f)
 
     # Проверка на валидность пути к файлу и экранирование пути через shlex.quote()
-    for tag in tags:
-        if tag in ALLOWED_TAGS:
-            filepath_str = shlex.quote(str(filepath))
-            cmd = ["exiftool", "-overwrite_original", f"-{tag}", filepath_str]
-            # subprocess.run(["exiftool", "-overwrite_original", f"-{tag}", filepath])
-            subprocess.run(cmd)
-
     # for tag in tags:
-    # subprocess.run(
-    # ["exiftool", "-overwrite_original", f"-{tag}", filepath])
-
-    # os.system(command)
-    # subprocess.run(command)
+    #    if tag in ALLOWED_TAGS:
+    #        filepath_str = shlex.quote(str(filepath))
+    #        cmd = ["exiftool", "-overwrite_original", f"-{tag}", filepath_str]
+        # subprocess.run(["exiftool", "-overwrite_original", f"-{tag}", filepath])
+    #        subprocess.run(cmd)
