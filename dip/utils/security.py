@@ -10,9 +10,37 @@ from flask import current_app
 
 ALLOWED_IMAGE_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
-# Список допустимых тегов
-# ALLOWED_TAGS = {'EXIF:Make', 'EXIF:Model', 'EXIF:Software'}
-ALLOWED_TAGS = {'0th', 'Exif', 'Interop', 'GPS', '1st'}
+# Список допустимых тегов и подтегов
+ALLOWED_TAGS = {
+    '0th': set(['Make', 'Model', 'Software']),
+    'Exif': set(),
+    'Interop': set(),
+    'GPS': set(),
+    '1st': set()
+}
+
+# повыше
+
+
+def remove_image_metadata(filename):
+    filepath = Path(current_app.root_path).parent / \
+        current_app.config["PATHS"]["user_images"] / filename
+
+    # валидация файлового пути
+    if not filepath.is_file():
+        return
+
+    img = piexif.load(str(filepath))
+    img_copy = img.copy()  # создаем копию словаря
+    for ifd in img_copy:  # используем копию словаря в цикле
+        if ifd in ALLOWED_TAGS:
+            for tag in img_copy[ifd]:
+                if tag not in ALLOWED_TAGS[ifd]:
+                    if ifd in img:
+                        del img[ifd]
+
+    exif_bytes = piexif.dump(img)
+    piexif.insert(exif_bytes, str(filepath))
 
 
 def generate_password_hash(password, salt):
@@ -46,38 +74,3 @@ def create_signature(username, role, secret_key):
     ).hexdigest()
 
     return signature
-
-
-def remove_image_metadata(filename):
-    filepath = Path(current_app.root_path).parent / \
-        current_app.config["PATHS"]["user_images"] / filename
-
-    # валидация файлового пути
-    if not filepath.is_file():
-        return
-
-    img = piexif.load(str(filepath))
-    for ifd in img:
-        if ifd in ALLOWED_TAGS:
-            for tag in img[ifd]:
-                if tag not in ALLOWED_TAGS[ifd]:
-                    img[ifd][tag] = piexif.ExifIFD[tag].default_value
-
-    exif_bytes = piexif.dump(img)
-    piexif.insert(exif_bytes, str(filepath))
-
-
-# Был бы ты человек
-'''
-def remove_image_metadata(filename):
-    filepath = Path(current_app.root_path).parent / \
-        current_app.config["PATHS"]["user_images"] / filename
-
-    # валидация файлового пути
-    if not filepath.is_file():
-        return
-
-    with exiftool.ExifTool() as et:
-        et.execute(b'-EXIF:Make', b'-EXIF:Model',
-                   b'-EXIF:Software', str(filepath))
-'''
