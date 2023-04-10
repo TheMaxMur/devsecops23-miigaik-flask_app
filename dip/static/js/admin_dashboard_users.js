@@ -18,22 +18,23 @@ editButtons.forEach((button) => {
 
     //предлжоение исправления №1:
     // Это позволит открыть модальное окно без вызова метода "preventDefault()", который вызывает ошибку.
-    //button.addEventListener('click', () => { openEditModal(userId) })
+    button.addEventListener('click', () => { openEditModal(userId) })
 
+    // ! Это дерьмо убивает кнопку карандаша для редактирования юзера в дашборде
     //предложение исправления №2, опять ебаный домен:
     //Уязвимость связана с тем, что при клике на кнопку "редактировать" не проверяется и 
     //не подтверждается идентичность отправителя сообщения. Чтобы исправить эту 
     //уязвимость, следует добавить проверку идентичности отправителя сообщения, используя 
     //свойства origin и source.
-    button.addEventListener('click', (e) => {
-        // Проверяем идентичность отправителя сообщения
-        if (e.origin === 'https://127.0.0.1:5000' || e.origin === 'https://eshe-domen:228' && e.source === window.opener) {
-            e.preventDefault();
-            openEditModal(userId);
-        } else {
-            console.warn('Unauthorized message sender');
-        }
-    });
+    //button.addEventListener('click', (e) => {
+    //    //Проверяем идентичность отправителя сообщения
+    //    if (e.origin === 'https://127.0.0.1:5000' || e.origin === 'https://eshe-domen:228' && e.source === window.opener) {
+    //        e.preventDefault();
+    //        openEditModal(userId);
+    //    } else {
+    //        console.warn('Unauthorized message sender');
+    //    }
+    //});
 });
 
 deleteButtons.forEach(button => {

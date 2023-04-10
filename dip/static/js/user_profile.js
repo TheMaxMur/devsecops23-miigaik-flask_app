@@ -1,6 +1,7 @@
 const editButton = document.querySelector(".user-card__button");
 //Оригинальная строчка:
-//editButton.addEventListener('click', (e) => { e.preventDefault(); openEditModal() })
+//оригинал из девелопа: //Вернуть и удалить гойскую функцию
+editButton.addEventListener('click', (e) => { e.preventDefault(); openEditModal() })
 
 //!
 //Текст уязвимости: When receiving message with message event, the sender's identity should 
@@ -10,20 +11,19 @@ const editButton = document.querySelector(".user-card__button");
 //editButton.addEventListener('click', (e) => { e.preventDefault(); openEditModal() })
 
 // Исправление. Опять хуйня с адресом страницы
-editButton.addEventListener('click', (e) => {
-    e.preventDefault();
-    //несколько адресов
-    if (e.origin !== "http://127.0.0.1:5000" || e.origin !== "http://example.ru") {
-        return;
-    }
-    openEditModal()
+//! + Это дерьмо убивает кнопку РЕДАКТИРОВАТЬ на странице твоего профиля.
+//editButton.addEventListener('click', (e) => {
+//    e.preventDefault();
+//несколько адресов
+//    if (e.origin !== "http://127.0.0.1:5000" || e.origin !== "http://example.ru") {
+//        return;
+//    }
+//    openEditModal()
 
-    //Previous shit:
-    //if (window.parent === e.source && "https://127.0.0.1:5000" === e.origin) {openEditModal()}
-})
+//Previous shit:
+//if (window.parent === e.source && "https://127.0.0.1:5000" === e.origin) {openEditModal()}
+//})
 
-//оригинал из девелопа: //Вернуть и удалить гойскую функцию
-//editButton.addEventListener('click', (e) => { e.preventDefault(); openEditModal() })
 
 const photoInput = document.getElementById("photo");
 const photoPreview = document.getElementById("photo_preview");

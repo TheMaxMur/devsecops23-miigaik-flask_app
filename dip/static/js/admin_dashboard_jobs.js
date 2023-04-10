@@ -9,9 +9,11 @@ deleteButtons.forEach(button => {
     e.preventDefault()
 
     const jobTitleId = button.parentNode.id;
-
+    //из девелопа:
     //deleteJobTitle(jobTitleId); //Чтобы вернуть всё, как было, нужно это раскомментить, а условие снизу + текст удалить нахой
 
+    // ! Это дерьмо убивает кнопку помойка УДАЛИТЬ в панели управления администратора.
+    // ! Оказалось, что кнопка помойки просто не работает, лол. Поэтому хз
     // Проверка наличия элемента с jobTitleId на странице
     const jobTitleEl = document.getElementById(jobTitleId);
     if (!jobTitleEl) {
@@ -19,7 +21,7 @@ deleteButtons.forEach(button => {
       return;
     }
 
-    // Проверка на подлинность отправителя и наличие достаточных прав
+    //Проверка на подлинность отправителя и наличие достаточных прав
     if (isAuthorizedToDelete(jobTitleId, e.origin, e.source)) {
       deleteJobTitle(jobTitleId);
     } else {
@@ -33,20 +35,6 @@ deleteButtons.forEach(button => {
     //(https://owasp.org/www-project-top-ten/2017/A2_2017-Broken_Authentication) and 
     //(https://developer. mozilla.org/en-US/docs/Web/API/Window/postMessage) advisory. 
     //Code: button.addEventListener('click', (e) => {
-
-    // Опять хуйня с адресом страницы.
-    // Нужно проверить идентификатор отправителя, который указывается в свойстве origin
-    // и в свойстве source объекта event. В условии происходит проверка, что отправитель 
-    // сообщения имеет идентификатор 
-    //if (e.origin === 'http://127.0.0.1:5000' && e.source === parent) {
-    //  deleteJobTitle(jobTitleId);
-    //} else {
-    //  console.warn('Неавторизованный отправитель');
-    //}
-
-    //из девелопа
-    //deleteJobTitle(jobTitleId);
-
   });
 });
 
