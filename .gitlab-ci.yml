@@ -83,3 +83,44 @@ container_scanning_flask_app:
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
     - if: $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH =~ /feature\/.*/
+
+deploy-image:
+  stage: deploy
+  needs: [build-app-image]
+  before_script:
+    - apk add openssh
+    - eval $(ssh-agent -s)
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+  script:
+    - >
+      ssh $USER@$SERVER_HOSTNAME -p $SERVER_PORT
+      "cd /home/$USER/iac/ &&
+      echo "$SERVER_PASSWORD" | sudo -S FLASK_APP_IMAGE=$CI_REGISTRY_IMAGE/flask_app:$IMAGE_TAG
+      docker-compose pull flask_app &&
+      echo "$SERVER_PASSWORD" | sudo -S FLASK_APP_IMAGE=$CI_REGISTRY_IMAGE/flask_app:$IMAGE_TAG
+      FLASK_SETTINGS_CLASS=$FLASK_SETTINGS VAULT_ROLE_ID=$ROLE_ID VAULT_SECRET_ID=$SECRET_ID
+      docker-compose up -d flask_app &&
+      exit"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+      variables:
+        IMAGE_TAG: "latest"
+        SERVER_HOSTNAME: "81.200.151.227"
+        SERVER_PORT: "32405"
+        SSH_PRIVATE_KEY: $PROD_MAIN_SERVER_SSH_KEY
+        SERVER_PASSWORD: $PROD_MAIN_SERVER_USER_PASS
+        ROLE_ID: $PROD_VAULT_ROLE_ID
+        SECRET_ID: $PROD_VAULT_SECRET_ID
+        FLASK_SETTINGS: settings.ProdConfig
+    - if: $CI_COMMIT_BRANCH == "develop"
+      variables:
+        IMAGE_TAG: "latest-dev"
+        SERVER_HOSTNAME: "176.53.162.210"
+        SERVER_PORT: "45323"
+        SSH_PRIVATE_KEY: $DEV_MAIN_SERVER_SSH_KEY
+        SERVER_PASSWORD: $DEV_MAIN_SERVER_USER_PASS
+        ROLE_ID: $DEV_VAULT_ROLE_ID
+        SECRET_ID: $DEV_VAULT_SECRET_ID
+        FLASK_SETTINGS: settings.DevConfig
