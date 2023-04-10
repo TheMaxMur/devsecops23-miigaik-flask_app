@@ -11,6 +11,9 @@ from flask import current_app
 
 ALLOWED_IMAGE_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
+# Список допустимых тегов
+ALLOWED_TAGS = {'EXIF:Make', 'EXIF:Model', 'EXIF:Software'}
+
 
 def generate_password_hash(password, salt):
     return hashlib.md5((password + salt).encode('utf-8')).hexdigest()
@@ -56,7 +59,13 @@ def remove_image_metadata(filename):
         tags = exifread.process_file(f)
 
     for tag in tags:
-        subprocess.run(
-            ["exiftool", "-overwrite_original", f"-{tag}", filepath])
+        if tag in ALLOWED_TAGS:
+            subprocess.run(
+                ["exiftool", "-overwrite_original", f"-{tag}", filepath])
+
+    # for tag in tags:
+    # subprocess.run(
+    # ["exiftool", "-overwrite_original", f"-{tag}", filepath])
+
     # os.system(command)
     # subprocess.run(command)
