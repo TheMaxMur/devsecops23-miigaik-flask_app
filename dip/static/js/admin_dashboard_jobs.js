@@ -42,6 +42,10 @@ deleteButtons.forEach(button => {
     //} else {
     //  console.warn('Неавторизованный отправитель');
     //}
+
+    //из девелопа
+    //deleteJobTitle(jobTitleId);
+
   });
 });
 

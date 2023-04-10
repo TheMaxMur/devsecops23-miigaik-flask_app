@@ -1,6 +1,6 @@
-var current_url = window.location.pathname;
+const current_url = window.location.pathname;
 
-var menu_items = document.querySelectorAll('.sidebar__item');
+const menu_items = document.querySelectorAll('.sidebar__item');
 
 for (const item of menu_items) {
   const menu_item_url = item.children[0].getAttribute('href');

@@ -21,7 +21,8 @@ editButton.addEventListener('click', (e) => {
     //if (window.parent === e.source && "https://127.0.0.1:5000" === e.origin) {openEditModal()}
 })
 
-
+//оригинал из девелопа
+//editButton.addEventListener('click', (e) => { e.preventDefault(); openEditModal() })
 
 const photoInput = document.getElementById("photo");
 const photoPreview = document.getElementById("photo_preview");
@@ -68,7 +69,10 @@ async function handleFormSubmit(event) {
     // Чтобы сервер мог отследить, что аватар не менялся
     if (formData.get('photo').name !== '') {
         // Чтобы пользователь не загрузил RCE
-        const newFilename = Math.random().toString(16).slice(2) + '.' + formData.get('photo').name.split('.').pop()
+        const array = new Uint32Array(1);
+        crypto.getRandomValues(array);
+
+        const newFilename = array[0].toString(16).slice(2) + '.' + formData.get('photo').name.split('.').pop()
         formData.set('photo', formData.get('photo'), newFilename);
     }
 

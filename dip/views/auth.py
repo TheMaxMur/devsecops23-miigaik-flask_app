@@ -42,6 +42,9 @@ def login():
         cur.execute(str(user_query))
         user = cur.fetchone()
 
+        if not user:
+            return render_template('login.html', error='Неверный логин или пароль'), 403
+
         user = dict(zip([
             'id',
             'first_name',

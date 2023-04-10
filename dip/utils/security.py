@@ -1,3 +1,5 @@
+# import os
+# import subprocess
 import hmac
 import hashlib
 import pathlib
@@ -44,7 +46,7 @@ def remove_image_metadata(filename):
 
 
 def generate_password_hash(password, salt):
-    return hashlib.md5((password + salt).encode('utf-8')).hexdigest()
+    return hashlib.sha256((password + salt).encode('utf-8')).hexdigest()
 
 
 def is_correct_password(plain_password, hashed_password, salt):
@@ -74,3 +76,17 @@ def create_signature(username, role, secret_key):
     ).hexdigest()
 
     return signature
+
+
+# из девелопа
+'''
+def remove_image_metadata(filename):
+    # ? filepath = pathlib.Path(current_app.root_path).parent / \
+    filepath = pathlib.Path(current_app.root_path).parent / \
+        current_app.config["PATHS"]["user_images"] / filename
+
+    command = f'exiftool -EXIF= { filepath }'
+
+    # os.system(command)
+    subprocess.run(command)
+'''
