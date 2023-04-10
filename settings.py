@@ -7,8 +7,8 @@ config.read('settings.cfg')
 
 
 class DevConfig:
-    SECRET_KEY = 'dev'
-    PASSWORD_SALT = 'dev'
+    SECRET_KEY = config.get('KEY', 'secret')
+    PASSWORD_SALT = config.get('KEY', 'salt')
     DATABASE_PATH = pathlib.Path('instance', 'devel.db')
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + str(DATABASE_PATH.resolve())
 
