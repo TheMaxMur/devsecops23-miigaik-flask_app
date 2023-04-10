@@ -117,8 +117,8 @@ deploy-image:
     - if: $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH =~ /feature\/.*/
       variables:
         IMAGE_TAG: "latest-dev"
-        SERVER_HOSTNAME: "176.53.162.210"
-        SERVER_PORT: "45323"
+        SERVER_HOSTNAME: "81.200.151.23"
+        SERVER_PORT: "52434"
         SSH_PRIVATE_KEY: $DEV_MAIN_SERVER_SSH_KEY
         SERVER_PASSWORD: $DEV_MAIN_SERVER_USER_PASS
         ROLE_ID: $DEV_VAULT_ROLE_ID
