@@ -2,7 +2,7 @@ import base64
 import functools
 import json
 
-from flask import current_app, request, redirect, url_for, g, render_template
+from flask import current_app, request, redirect, url_for, g, render_template, abort
 
 from dip.models import User
 from dip.utils.security import is_valid_signature, create_signature
@@ -73,7 +73,7 @@ def role_required(roles):
             if identity['role'] in roles:
                 return f(*args, **kwargs)
             else:
-                return render_template('errors/403.html')
+                return abort(403)
         return wrapper
     return decorator
 
@@ -88,7 +88,7 @@ def admin_only(f):
                 return f(*args, **kwargs)
 
         else:
-            return render_template('errors/403.html'), 403
+            return abort(403)
 
     return admin_only_wrapper
 
