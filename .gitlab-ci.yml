@@ -46,7 +46,8 @@ sast:
     - >
       docker run -v /var/run/docker.sock:/var/run/docker.sock 
       -v $(pwd):/src/horusec horuszup/horusec-cli:latest 
-      horusec start -p /src/horusec/ -P $(pwd) -s="LOW" -o="json" -O="/src/horusec/report.json" &&
+      horusec start -i="**/settings_local.py" -i="**/dip/static/js/**" -i="**/settings_dev.py" -i="**/settings_prod.py" 
+      -p /src/horusec/ -P $(pwd) -s="LOW" -o="json" -O="/src/horusec/report.json" &&
       curl -k -X POST -H "Authorization: Token $DEFECTDOJO_API_KEY" -F "file=@$(pwd)/report.json" 
       -F "product_name=FlaskApp" -F "engagement_name=gitlabCi" -F "scan_type=Horusec Scan" 
       https://defectdojo.devsecops.maxmur.info/api/v2/import-scan/
