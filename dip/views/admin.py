@@ -17,12 +17,12 @@ MAGIC_NUMBERS = { 'png': bytes([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A])
                 }
 
 def validate_string(input_string: str) -> bool:
-    if len(input_string) > 50:
+    if (len(input_string) > 50) and (re.match("^[a-zA-Zа-яА-я0-9@.]+$", input_string)):
         return False
     return True
 
 def validate_phone(phone_string: str) -> bool:
-    if len(phone_string) <= 12:
+    if (len(phone_string) <= 12):
         return re.match(r'^(\+7|7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$', phone_string)
     return False
 
@@ -111,7 +111,6 @@ def user_update(id_):
         user.password = generate_password_hash(user_data.get(
             'password'), current_app.config['PASSWORD_SALT'])
 
-    # TODO добавить валидаторы для разных полей
     user.username = user_data.get('username')
     user.first_name = user_data.get('first_name')
     user.second_name = user_data.get('second_name')
@@ -125,17 +124,17 @@ def user_update(id_):
     # Validation
 
     if not validate_string(user.username):
-        return f'Username не может быть длиннее 50 символов', 409
+        return f'Username введен некорректно', 409
     if not validate_string(user.first_name):
-        return f'Имя не может быть длиннее 50 символов', 409
+        return f'Имя введено некорректно', 409
     if not validate_string(user.second_name):
-        return f'Фамилия не может быть длиннее 50 символов', 409
+        return f'Фамилия введена некорректно', 409
     if not validate_string(user.patronymic):
-        return f'Отчество не может быть длиннее 50 символов', 409
+        return f'Отчество введено некорректно', 409
     if not validate_string(user.email):
-        return f'Email не может быть длиннее 50 символов', 409
+        return f'Email введен некорректно', 409
     if not validate_string(user.role):
-        return f'Название роли не может быть длиннее 50 символов', 409
+        return f'Название роли введено некорректно', 409
     if not validate_phone(user.phone_number):
         return f'Некорректный номер телефона', 409
 
@@ -207,7 +206,6 @@ def user_create():
     if not user_data.get('password'):
         return f'Пароль не указан', 400
 
-    # TODO добавить валидаторы для разных полей
     user.username = user_data.get('username')
     user.first_name = user_data.get('first_name')
     user.second_name = user_data.get('second_name')
@@ -221,17 +219,17 @@ def user_create():
         'password'), current_app.config['PASSWORD_SALT'])
 
     if not validate_string(user.username):
-        return f'Username не может быть длиннее 50 символов', 409
+        return f'Username введен некорректно', 409
     if not validate_string(user.first_name):
-        return f'Имя не может быть длиннее 50 символов', 409
+        return f'Имя введен некорректно', 409
     if not validate_string(user.second_name):
-        return f'Фамилия не может быть длиннее 50 символов', 409
+        return f'Фамилия введен некорректно', 409
     if not validate_string(user.patronymic):
-        return f'Отчество не может быть длиннее 50 символов', 409
+        return f'Отчество введен некорректно', 409
     if not validate_string(user.email):
-        return f'Email не может быть длиннее 50 символов', 409
+        return f'Email введен некорректно', 409
     if not validate_string(user.role):
-        return f'Название роли не может быть длиннее 50 символов', 409
+        return f'Название роли введен некорректно', 409
     if not validate_phone(user.phone_number):
         return f'Некорректный номер телефона', 409
 

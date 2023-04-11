@@ -146,7 +146,6 @@ async function openEditModal(userId) {
         document.getElementById('photo_preview').src = `/static/img/profile-picture.jpg`;
 
     }
-    currentUser = null;
     var errorElement = document.querySelector('.message-error');
     errorElement.style.display = 'none'
     modal.style.display = 'block';
