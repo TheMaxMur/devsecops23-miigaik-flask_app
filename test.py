@@ -28,7 +28,7 @@ def test_new_job_title_gui():
     client=app.test_client()
     response = client.post('/login', data=dict(username='admin',password='admin'))    
     response = client.post('/admin/dashboard/job-titles', data=dict(job_title='test'))
-    assert response.status_code == 301   
+    assert response.status_code == 302   
 
 def test_logout():
     app=create_app()
