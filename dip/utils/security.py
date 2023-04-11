@@ -4,6 +4,7 @@ import pathlib
 from pathlib import Path
 import piexif
 from flask import current_app
+from PIL import Image
 
 
 ALLOWED_IMAGE_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
@@ -25,19 +26,14 @@ def remove_image_metadata(filename):
     # валидация файлового пути
     if not filepath.is_file():
         return
+    
+    image = Image.open(str(filepath))
 
-    img = piexif.load(str(filepath))
-    img_copy = img.copy()  # создаем копию словаря
-    for ifd in img_copy:  # используем копию словаря в цикле
-        if ifd in ALLOWED_TAGS:
-            for tag in img_copy[ifd]:
-                if tag not in ALLOWED_TAGS[ifd]:
-                    if ifd in img:
-                        del img[ifd]
+    data = list(image.getdata())
+    image_without_exif = Image.new(image.mode, image.size)
+    image_without_exif.putdata(data)
 
-    exif_bytes = piexif.dump(img)
-    piexif.insert(exif_bytes, str(filepath))
-# Перенес удаление метаданныых повыше
+    image_without_exif.save(str(filepath))
 
 
 def generate_password_hash(password, salt):

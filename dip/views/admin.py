@@ -8,6 +8,12 @@ from dip.models import JobTitle, User
 
 bp = Blueprint('bp_admin', __name__)
 
+MAGIC_NUMBERS = { 'png': bytes([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]),
+                  'jpg': bytes([0xFF, 0xD8, 0xFF, 0xE0]),
+                  'jpeg': bytes([0xFF, 0xD8, 0xFF, 0xDB]),
+                  'jpeg-jfif': bytes([0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01]),
+                  'jpeg1': bytes([0xFF, 0xD8, 0xFF, 0xEE]),
+                }
 
 @bp.route('/admin/dashboard/users', methods=['GET'])
 @admin_only
@@ -66,8 +72,27 @@ def user_update(id_):
             photo_file.filename
 
         if not filepath.exists():
-            photo_file.save(filepath)
-            remove_image_metadata(photo_file.filename)
+            max_read_size = max(len(m) for m in MAGIC_NUMBERS.values())
+            file_head = photo_file.read(max_read_size)
+
+            flag = 0
+            for ext in MAGIC_NUMBERS:
+                print(file_head.startswith(MAGIC_NUMBERS[ext]), file_head, MAGIC_NUMBERS[ext])
+                if file_head.startswith(MAGIC_NUMBERS[ext]):
+                    photo_file.save(filepath)
+                    with open(filepath, 'rb') as file:
+                        content = file.read()
+
+                    with open(filepath, 'wb') as file:
+                        file.write(file_head)
+                        file.write(content)
+
+                    remove_image_metadata(photo_file.filename)
+                    flag += 1
+                    break
+
+            if not flag:
+                return f'Нельзя загружать файлы данного типа', 403
 
         user.photo = photo_file.filename
 
@@ -127,8 +152,27 @@ def user_create():
             photo_file.filename
 
         if not filepath.exists():
-            photo_file.save(filepath)
-            remove_image_metadata(photo_file.filename)
+            max_read_size = max(len(m) for m in MAGIC_NUMBERS.values())
+            file_head = photo_file.read(max_read_size)
+
+            flag = 0
+            for ext in MAGIC_NUMBERS:
+                print(file_head.startswith(MAGIC_NUMBERS[ext]), file_head, MAGIC_NUMBERS[ext])
+                if file_head.startswith(MAGIC_NUMBERS[ext]):
+                    photo_file.save(filepath)
+                    with open(filepath, 'rb') as file:
+                        content = file.read()
+
+                    with open(filepath, 'wb') as file:
+                        file.write(file_head)
+                        file.write(content)
+
+                    remove_image_metadata(photo_file.filename)
+                    flag += 1
+                    break
+
+            if not flag:
+                return f'Нельзя загружать файлы данного типа', 403
 
         user.photo = photo_file.filename
 
@@ -152,6 +196,24 @@ def user_create():
     db.session.commit()
 
     return redirect(url_for('bp_admin.users'))
+
+
+@bp.route('/admin/dashboard/user/<id_>/delete', methods=['GET', 'POST'])
+@admin_only
+def user_delete(id_):
+    if id_ == "1":
+        return f'Невозможно удалить пользователя, потому что он является корневым', 409
+
+    user = User.query.filter_by(id=id_).first()
+
+    if not user:
+
+        return f'Пользователь с id {id_} не найдена', 404
+
+    db.session.delete(user)
+    db.session.commit()
+
+    return 'ok', 200
 
 
 @bp.route('/admin/dashboard/job-titles', methods=['GET', 'POST'])
@@ -190,7 +252,6 @@ def job_title_delete(id_):
     job_title = JobTitle.query.filter_by(id=id_).first()
 
     if not job_title:
-
         return f'Должность с id {id_} не найдена', 404
 
     if job_title.users:
