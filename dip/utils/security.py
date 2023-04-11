@@ -2,7 +2,6 @@ import hmac
 import hashlib
 import pathlib
 from pathlib import Path
-import piexif
 from flask import current_app
 from PIL import Image
 
