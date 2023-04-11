@@ -24,11 +24,25 @@ editButtons.forEach((button) => {
 });
 
 deleteButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        //Из-за этого не работает кнопка удаления в исходном коде.
-        const name = button.parentNode.querySelector('.user-list__name').textContent;
-        button.parentNode.remove();
-    });
+    button.addEventListener('click', (e) => {
+
+        e.preventDefault()
+    
+        const userId = button.parentNode.parentNode.id;
+
+        const userIdEl = document.getElementById(userId);
+        if (!userIdEl) {
+          console.error(`Элемент по номеру ID ${userIdEl} на странице не найден`);
+          return;
+        }
+    
+        //Проверка на подлинность отправителя
+        if (e.source == window.opener) {
+            deleteUser(userId);
+        } else {
+          console.error(`Неавторизованная попытка удалить ID ${userId}`);
+        }
+      });
 });
 
 
@@ -79,6 +93,19 @@ async function updateUser(id, data) {
     return updatedUser;
 }
 
+function deleteUser(userId) {
+    fetch(`/admin/dashboard/user/${userId}/delete`)
+      .then((response) => {
+        if (response.ok) {
+          const el = document.querySelector(`.user-list__item[id="${userId}"]`);
+          el.remove();
+        } else {
+          response.text().then((error) => {
+            showError(error)
+          })
+        }
+      })
+  }
 
 async function openEditModal(userId) {
 
@@ -170,6 +197,19 @@ async function handleFormSubmit(event) {
         })
 
 }
+
+var timer = null;
+
+function showError(message) {
+    if (timer !== null) {
+      clearTimeout(timer);
+      timer = null;
+    }
+    var errorElement = document.querySelector(".job-titles-list__temp-message-error");
+    errorElement.innerHTML = message;
+    errorElement.style.display = 'block';
+    timer = setTimeout(function () { errorElement.style.display = 'none'; }, 2000);
+  }
 
 cancelButton.addEventListener('click', closeEditModal);
 editUserForm.addEventListener('submit', handleFormSubmit);
