@@ -49,7 +49,7 @@ deleteButtons.forEach(button => {
 
 addButton.addEventListener('click', (e) => {
     e.preventDefault();
-    const userId = null
+    const userId = null;
     openEditModal(userId);
 })
 
@@ -125,10 +125,28 @@ async function openEditModal(userId) {
 
         if (currentUser.photo) {
             document.getElementById('photo_preview').src = `/user/${userId}/photo`;
+        } else {
+            document.getElementById('photo_preview').src = `/static/img/profile-picture.jpg`;
         }
 
 
+    } else {
+
+        currentUser = null; //await getUserData(userId)
+
+        editUserForm.elements.id.value = null;
+        editUserForm.elements.username.value = '';
+        editUserForm.elements.first_name.value = '';
+        editUserForm.elements.second_name.value = '';
+        editUserForm.elements.patronymic.value = '';
+        editUserForm.elements.job_title.value = '';
+        editUserForm.elements.email.value = '';
+        editUserForm.elements.phone_number.value = '';
+        editUserForm.elements.role.value = '';
+        document.getElementById('photo_preview').src = `/static/img/profile-picture.jpg`;
+
     }
+    currentUser = null;
     var errorElement = document.querySelector('.message-error');
     errorElement.style.display = 'none'
     modal.style.display = 'block';
@@ -151,6 +169,7 @@ photoPreview.addEventListener("click", function () { photoInput.click() })
 
 
 function closeEditModal() {
+    //currentUser = null;
     modal.style.display = 'none';
 }
 

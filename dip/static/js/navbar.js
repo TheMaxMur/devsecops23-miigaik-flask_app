@@ -1,8 +1,8 @@
 const current_url = window.location.pathname;
 
-const menu_items = document.querySelectorAll('.navbar__menu-item');
+const navbar_menu = document.querySelectorAll('.navbar__menu-item');
 
-for (const item of menu_items) {
+for (const item of navbar_menu) {
   const menu_item_url = item.children[0].getAttribute('href');
 
   if (current_url === menu_item_url) {

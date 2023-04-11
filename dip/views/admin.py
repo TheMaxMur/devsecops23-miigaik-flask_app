@@ -1,4 +1,5 @@
 from flask import Blueprint, make_response, render_template, request, url_for, redirect, jsonify, current_app
+import re
 
 from dip.extensions import db
 from dip.utils.session import set_user_identity, admin_only
@@ -14,6 +15,16 @@ MAGIC_NUMBERS = { 'png': bytes([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A])
                   'jpeg-jfif': bytes([0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01]),
                   'jpeg1': bytes([0xFF, 0xD8, 0xFF, 0xEE]),
                 }
+
+def validate_string(input_string: str) -> bool:
+    if len(input_string) > 50:
+        return False
+    return True
+
+def validate_phone(phone_string: str) -> bool:
+    if len(phone_string) <= 12:
+        return re.match(r'^(\+7|7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$', phone_string)
+    return False
 
 @bp.route('/admin/dashboard/users', methods=['GET'])
 @admin_only
@@ -111,6 +122,23 @@ def user_update(id_):
     user.job_title = JobTitle.query.filter_by(
         id=user_data.get("job_title")).first()
 
+    # Validation
+
+    if not validate_string(user.username):
+        return f'Username не может быть длиннее 50 символов', 409
+    if not validate_string(user.first_name):
+        return f'Имя не может быть длиннее 50 символов', 409
+    if not validate_string(user.second_name):
+        return f'Фамилия не может быть длиннее 50 символов', 409
+    if not validate_string(user.patronymic):
+        return f'Отчество не может быть длиннее 50 символов', 409
+    if not validate_string(user.email):
+        return f'Email не может быть длиннее 50 символов', 409
+    if not validate_string(user.role):
+        return f'Название роли не может быть длиннее 50 символов', 409
+    if not validate_phone(user.phone_number):
+        return f'Некорректный номер телефона', 409
+
     db.session.commit()
 
     return redirect(url_for('bp_admin.users'))
@@ -191,6 +219,21 @@ def user_create():
 
     user.password = generate_password_hash(user_data.get(
         'password'), current_app.config['PASSWORD_SALT'])
+
+    if not validate_string(user.username):
+        return f'Username не может быть длиннее 50 символов', 409
+    if not validate_string(user.first_name):
+        return f'Имя не может быть длиннее 50 символов', 409
+    if not validate_string(user.second_name):
+        return f'Фамилия не может быть длиннее 50 символов', 409
+    if not validate_string(user.patronymic):
+        return f'Отчество не может быть длиннее 50 символов', 409
+    if not validate_string(user.email):
+        return f'Email не может быть длиннее 50 символов', 409
+    if not validate_string(user.role):
+        return f'Название роли не может быть длиннее 50 символов', 409
+    if not validate_phone(user.phone_number):
+        return f'Некорректный номер телефона', 409
 
     db.session.add(user)
     db.session.commit()

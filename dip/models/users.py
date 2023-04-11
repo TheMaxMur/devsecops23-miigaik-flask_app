@@ -14,7 +14,7 @@ class User(db.Model):
     email = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
 
-    phone_number = db.Column(db.String(11))
+    phone_number = db.Column(db.String(12))
     job_title_id = db.Column(db.ForeignKey('job_titles.id'))
     job_title = db.relationship('JobTitle', back_populates='users')
 
