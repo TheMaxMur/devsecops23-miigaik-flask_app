@@ -58,7 +58,7 @@ def profile():
         return redirect(url_for('bp_user.profile'))
 
 @bp.route('/profile/<username>', methods=['GET', 'POST'])
-@role_required(['user'])
+@role_required(['user', 'admin'])
 def profile_username(username):
     if request.method == 'GET':
 

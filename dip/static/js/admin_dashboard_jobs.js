@@ -24,7 +24,7 @@ deleteButtons.forEach(button => {
     if (e.source == window.opener) {
       deleteJobTitle(jobTitleId);
     } else {
-      console.error(`Неавторизованная поптыка удалить ID ${jobTitleId}`);
+      console.error(`Неавторизованная попытка удалить ID ${jobTitleId}`);
     }
   });
 });
@@ -52,6 +52,10 @@ function deleteJobTitle(jobTitleId) {
       if (response.ok) {
         const el = document.querySelector(`.job-titles-list__item[id="${jobTitleId}"]`);
         el.remove();
+      } else {
+        response.text().then((error) => {
+          showError(error)
+        })
       }
     })
 }

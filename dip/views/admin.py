@@ -154,6 +154,25 @@ def user_create():
     return redirect(url_for('bp_admin.users'))
 
 
+@bp.route('/admin/dashboard/user/<id_>/delete', methods=['GET', 'POST'])
+@admin_only
+def user_delete(id_):
+
+    if id_ == 1:
+        return f'Невозможно удалить пользователя, потому что он является корневым', 409
+
+    user = User.query.filter_by(id=id_).first()
+
+    if not user:
+
+        return f'Пользователь с id {id_} не найдена', 404
+
+    db.session.delete(user)
+    db.session.commit()
+
+    return 'ok', 200
+
+
 @bp.route('/admin/dashboard/job-titles', methods=['GET', 'POST'])
 @admin_only
 def job_titles():
@@ -190,7 +209,6 @@ def job_title_delete(id_):
     job_title = JobTitle.query.filter_by(id=id_).first()
 
     if not job_title:
-
         return f'Должность с id {id_} не найдена', 404
 
     if job_title.users:
