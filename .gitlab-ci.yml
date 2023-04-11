@@ -86,12 +86,8 @@ container_scanning_flask_app:
     - if: $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH =~ /feature\/.*/
 test:
   stage: test
-  before_script:
-    - apk update 
-    - apk add python3
-    - pip3 install pytest
   script:
-    - python3 -m pytest test.py
+    -  docker run --entrypoint "python3" $CI_REGISTRY_IMAGE/flask_app:$CI_COMMIT_SHORT_SHA "-m" "pytest" "-v" "test.py" 
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
     - if: $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH =~ /feature\/.*/
