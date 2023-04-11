@@ -98,7 +98,7 @@ unit_test:
 
 deploy-image:
   stage: deploy
-  needs: [test]
+  needs: [unit_test]
   before_script:
     - apk add openssh
     - eval $(ssh-agent -s)
