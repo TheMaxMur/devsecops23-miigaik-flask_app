@@ -157,8 +157,7 @@ def user_create():
 @bp.route('/admin/dashboard/user/<id_>/delete', methods=['GET', 'POST'])
 @admin_only
 def user_delete(id_):
-
-    if id_ == 1:
+    if id_ == "1":
         return f'Невозможно удалить пользователя, потому что он является корневым', 409
 
     user = User.query.filter_by(id=id_).first()
