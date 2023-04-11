@@ -1,29 +1,17 @@
 const editButton = document.querySelector(".user-card__button");
-//Оригинальная строчка:
-//оригинал из девелопа: //Вернуть и удалить гойскую функцию
-editButton.addEventListener('click', (e) => { e.preventDefault(); openEditModal() })
 
-//!
-//Текст уязвимости: When receiving message with message event, the sender's identity should 
-//be verified using the origin and possibly source properties. For more information checkout the OWASP A2:2017 
-//(https://owasp.org/www-project-top-ten/2017/A2_2017-Broken_Authentication) and 
-//(https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) advisory. Code: 
-//editButton.addEventListener('click', (e) => { e.preventDefault(); openEditModal() })
+//editButton.addEventListener('click', (e) => { e.preventDefault(); openEditModal() }) //оригинал из девелопа
 
-// Исправление. Опять хуйня с адресом страницы
-//! + Это дерьмо убивает кнопку РЕДАКТИРОВАТЬ на странице твоего профиля.
-//editButton.addEventListener('click', (e) => {
-//    e.preventDefault();
-//несколько адресов
-//    if (e.origin !== "http://127.0.0.1:5000" || e.origin !== "http://example.ru") {
-//        return;
-//    }
-//    openEditModal()
-
-//Previous shit:
-//if (window.parent === e.source && "https://127.0.0.1:5000" === e.origin) {openEditModal()}
-//})
-
+//Эта доработка больше не убивает кнопку РЕДАКТИРОВАТЬ на странице Профиля.
+editButton.addEventListener('click', (e) => {
+    //Проверяем идентичность отправителя сообщения
+    if (e.source == window.opener) {
+        e.preventDefault();
+        openEditModal();
+    } else {
+        console.warn('Unauthorized user-card edit sender');
+    }
+});
 
 const photoInput = document.getElementById("photo");
 const photoPreview = document.getElementById("photo_preview");

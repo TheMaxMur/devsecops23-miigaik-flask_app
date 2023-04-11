@@ -10,10 +10,9 @@ deleteButtons.forEach(button => {
 
     const jobTitleId = button.parentNode.id;
     //из девелопа:
-    //deleteJobTitle(jobTitleId); //Чтобы вернуть всё, как было, нужно это раскомментить, а условие снизу + текст удалить нахой
+    //deleteJobTitle(jobTitleId); //Чтобы вернуть всё, как было, нужно это раскомментить, а условие снизу + текст удалить
 
-    // ! Это дерьмо убивает кнопку помойка УДАЛИТЬ в панели управления администратора.
-    // ! Оказалось, что кнопка помойки просто не работает, лол. Поэтому хз
+    // ! Кнопка помойки просто не работает, поэтому исправление не особо нужно
     // Проверка наличия элемента с jobTitleId на странице
     const jobTitleEl = document.getElementById(jobTitleId);
     if (!jobTitleEl) {
@@ -21,20 +20,12 @@ deleteButtons.forEach(button => {
       return;
     }
 
-    //Проверка на подлинность отправителя и наличие достаточных прав
-    if (isAuthorizedToDelete(jobTitleId, e.origin, e.source)) {
+    //Проверка на подлинность отправителя
+    if (e.source == window.opener) {
       deleteJobTitle(jobTitleId);
     } else {
       console.error(`Неавторизованная поптыка удалить ID ${jobTitleId}`);
     }
-
-    //!
-    //Текст уязвимости, сслыку не нашёл: When receiving message with message event, the 
-    //sender's identity should be verified using the origin and possibly source properties. 
-    //For more information checkout the OWASP A2:2017 
-    //(https://owasp.org/www-project-top-ten/2017/A2_2017-Broken_Authentication) and 
-    //(https://developer. mozilla.org/en-US/docs/Web/API/Window/postMessage) advisory. 
-    //Code: button.addEventListener('click', (e) => {
   });
 });
 

@@ -1,11 +1,7 @@
-# import os
-# import subprocess
 import hmac
 import hashlib
 import pathlib
-
 from pathlib import Path
-# from pyexiftool import exiftool  # Хули он подчеркивается я же скачал пипом
 import piexif
 from flask import current_app
 
@@ -20,8 +16,6 @@ ALLOWED_TAGS = {
     'GPS': set(),
     '1st': set()
 }
-
-# повыше
 
 
 def remove_image_metadata(filename):
@@ -43,6 +37,7 @@ def remove_image_metadata(filename):
 
     exif_bytes = piexif.dump(img)
     piexif.insert(exif_bytes, str(filepath))
+# Перенес удаление метаданныых повыше
 
 
 def generate_password_hash(password, salt):

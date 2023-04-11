@@ -5,44 +5,33 @@ const deleteButtons = document.querySelectorAll('.user-list__button--delete');
 const addButton = document.querySelector('.user-list__button--add');
 
 editButtons.forEach((button) => {
-    const userId = button.parentNode.parentNode.id
-    //button.addEventListener('click', (e) => { e.preventDefault(); openEditModal(userId) })
+    const userId = button.parentNode.parentNode.id;
+    //button.addEventListener('click', (e) => { e.preventDefault(); openEditModal(userId) }) // оригинпальная строка
 
-    //!
-    //Текст уязвимости: "When receiving message with message event, the sender's identity 
-    //should be verified using the origin and possibly source properties. For more
-    //information checkout the OWASP A2:2017 
-    //(https://owasp.org/www-project-top-ten/2017/A2_2017-Broken_Authentication) and 
-    //(https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) advisory.
-    //Code: button.addEventListener('click', (e) => { e.preventDefault(); openEditModal(userId) })"
+    //button.addEventListener('click', () => { openEditModal(userId) }) // Этот вариант позволит открыть модальное окно без вызова метода "preventDefault()", который вызывает ошибку.
 
-    //предлжоение исправления №1:
-    // Это позволит открыть модальное окно без вызова метода "preventDefault()", который вызывает ошибку.
-    button.addEventListener('click', () => { openEditModal(userId) })
-
-    // ! Это дерьмо убивает кнопку карандаша для редактирования юзера в дашборде
-    //предложение исправления №2, опять ебаный домен:
-    //Уязвимость связана с тем, что при клике на кнопку "редактировать" не проверяется и 
-    //не подтверждается идентичность отправителя сообщения. Чтобы исправить эту 
-    //уязвимость, следует добавить проверку идентичности отправителя сообщения, используя 
-    //свойства origin и source.
-    //button.addEventListener('click', (e) => {
-    //    //Проверяем идентичность отправителя сообщения
-    //    if (e.origin === 'https://127.0.0.1:5000' || e.origin === 'https://eshe-domen:228' && e.source === window.opener) {
-    //        e.preventDefault();
-    //        openEditModal(userId);
-    //    } else {
-    //        console.warn('Unauthorized message sender');
-    //    }
-    //});
+    //Это БОЛЬШЕ НЕ убивает кнопку карандаша для редактирования юзера в дашборде.
+    //При клике на кнопку "редактировать" не проверяется и не подтверждается идентичность отправителя сообщения. Чтобы исправить это, следует добавить проверку идентичности отправителя сообщения, используя свойства [origin и] source.
+    button.addEventListener('click', (e) => {
+        //Проверяем идентичность отправителя сообщения
+        if (e.source == window.opener) {
+            e.preventDefault();
+            openEditModal(userId);
+        } else {
+            console.warn('Unauthorized message sender');
+        }
+    });
 });
 
 deleteButtons.forEach(button => {
     button.addEventListener('click', () => {
+        //Из-за этого не работает кнопка удаления в исходном коде.
         const name = button.parentNode.querySelector('.user-list__name').textContent;
         button.parentNode.remove();
     });
 });
+
+
 
 addButton.addEventListener('click', (e) => {
     e.preventDefault();
