@@ -1,5 +1,6 @@
 from flask import Blueprint, make_response, render_template, request, url_for, current_app, redirect, g
 from sqlalchemy import text
+import re
 
 from dip.utils.session import get_current_user, create_session
 from dip.utils.session import set_user_identity, SESSION_COOKIE_NAME
@@ -25,9 +26,11 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         plain_password = request.form['password']
+        pattern = "[^a-zA-Zа-яА-Я0-9?!#$%@]"
 
         #
         username = username.replace("'", "")
+        username = re.sub(pattern, "", username)
         plain_password = plain_password.replace("'", "")
         #
 
