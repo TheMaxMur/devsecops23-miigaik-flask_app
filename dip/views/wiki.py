@@ -1,6 +1,7 @@
 from flask import Blueprint, make_response, render_template, request, url_for, current_app, redirect, render_template_string
 from sqlalchemy import desc
 from slugify import slugify
+import re
 
 from dip.utils.session import authed_only, get_current_user
 from dip.extensions import db
@@ -32,6 +33,7 @@ def wiki_slug(slug):
 @bp.route('/wiki/create', methods=['GET', 'POST'])
 @authed_only
 def wiki_create():
+    pattern = "[^a-zA-Zа-яА-Я0-9.,;:#!?()\\s\\n]"
 
     if request.method == 'GET':
         return render_template('wiki_create.html')
@@ -41,6 +43,7 @@ def wiki_create():
     title = wiki_data.get('title')
     title = title.replace("'", "")
     title = title.replace('"', "")
+    title = re.sub(pattern, "", title)
 
     if not title:
         return render_template('wiki_create.html', error='Не указан заголовок'), 400
@@ -54,10 +57,12 @@ def wiki_create():
     content = content.replace("}", "")
     content = content.replace("'", "")
     content = content.replace('"', "")
+    content = re.sub(pattern, "", content)
 
     slug = slugify(title)
     slug = slug.replace("'", "")
     slug = slug.replace('"', "")
+    slug = re.sub(pattern, "", slug)
 
     current_user = get_current_user()
 
