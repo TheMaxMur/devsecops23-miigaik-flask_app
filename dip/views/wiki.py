@@ -39,6 +39,8 @@ def wiki_create():
     wiki_data = request.form
 
     title = wiki_data.get('title')
+    title = title.replace("'", "")
+    title = title.replace('"', "")
 
     if not title:
         return render_template('wiki_create.html', error='Не указан заголовок'), 400
@@ -48,9 +50,14 @@ def wiki_create():
     if title_exists:
         return render_template('wiki_create.html', error='Запись с таким именем уже существует'), 400
 
-    content = wiki_data.get('content')
+    content = wiki_data.get('content').replace("{", "")
+    content = content.replace("}", "")
+    content = content.replace("'", "")
+    content = content.replace('"', "")
 
     slug = slugify(title)
+    slug = slug.replace("'", "")
+    slug = slug.replace('"', "")
 
     current_user = get_current_user()
 
